@@ -1,0 +1,40 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+
+# Environment files
+.env
+.env*.local
+
+# SQLite local data
+/data/
+*.db
+*.db-journal
+
+# Temporary / Scratch
+/tools/
+/scratch/
+update_days.js
+test_api.mjs
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS metadata
+.DS_Store
+*.pem
+Thumbs.db
