@@ -39,23 +39,36 @@ export function AuthProvider({ children }) {
   }, [fetchSession]);
 
   const login = async (email, password) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Login failed');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      if (typeof window !== 'undefined' && data.token) {
+        localStorage.setItem('sssam_auth_token', data.token);
+      }
+
+      setUser(data.user);
+      return data.user;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('Connection timed out. Please check your network and try again.');
+      }
+      throw err;
     }
-
-    if (typeof window !== 'undefined' && data.token) {
-      localStorage.setItem('sssam_auth_token', data.token);
-    }
-
-    setUser(data.user);
-    return data.user;
   };
 
   const logout = async () => {
