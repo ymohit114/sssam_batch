@@ -24,11 +24,8 @@ export default function Sidebar() {
   if (!user) return null;
 
   const counselorNav = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Batch Management', href: '/batches', icon: Layers },
-    { name: 'Trainer Management', href: '/trainers', icon: Users },
+    { name: 'Batches & Timetable', href: '/', icon: Layers },
     { name: 'Student Directory', href: '/students', icon: GraduationCap },
-    { name: 'Master Timetable', href: '/timetable', icon: Calendar },
   ];
 
   const trainerNav = [
