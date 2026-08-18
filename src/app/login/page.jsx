@@ -111,9 +111,9 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
-                    🧑‍🏫 Mohit Yadav (Trainer)
+                    🧑‍🏫 Mohit Yadav (Cyber Security)
                   </div>
-                  <div className="text-[10px] text-slate-500">View Mohit's Batches • Add Students</div>
+                  <div className="text-[10px] text-slate-500">Cyber Security Trainer • Add Students</div>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-indigo-600 group-hover:translate-x-0.5 transition-transform" />
@@ -132,9 +132,9 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
-                    🧑‍🏫 Sudesh Yadav (Trainer)
+                    🧑‍🏫 Sudesh Yadav (Data Analytics &amp; Data Science)
                   </div>
-                  <div className="text-[10px] text-slate-500">View Sudesh's Batches • Add Students</div>
+                  <div className="text-[10px] text-slate-500">Data Analytics &amp; AI Trainer • Add Students</div>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />

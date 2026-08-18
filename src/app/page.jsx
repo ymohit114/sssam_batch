@@ -197,7 +197,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h2 className="text-lg font-black text-slate-900">
-                    Mohit Yadav (Trainer)
+                    Mohit Yadav (Cyber Security)
                   </h2>
                   <p className="text-xs text-indigo-600 font-bold">
                     {mohitBatches.length} Active Batch{mohitBatches.length !== 1 ? 'es' : ''} Assigned
@@ -254,7 +254,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h2 className="text-lg font-black text-slate-900">
-                    Sudesh Yadav (Trainer)
+                    Sudesh Yadav (Data Analytics &amp; Data Science)
                   </h2>
                   <p className="text-xs text-emerald-600 font-bold">
                     {sudeshBatches.length} Active Batch{sudeshBatches.length !== 1 ? 'es' : ''} Assigned

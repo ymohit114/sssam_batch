@@ -102,7 +102,7 @@ export default function Navbar() {
                     >
                       <div>
                         <div className="font-bold text-slate-800 group-hover:text-indigo-700">🧑‍🏫 Mohit Yadav</div>
-                        <div className="text-[10px] text-slate-500">mohit@gmail.com • Trainer</div>
+                        <div className="text-[10px] text-slate-500">mohit@gmail.com • Cyber Security</div>
                       </div>
                       {user.email === 'mohit@gmail.com' && <span className="w-2 h-2 rounded-full bg-indigo-600"></span>}
                     </button>
@@ -114,7 +114,7 @@ export default function Navbar() {
                     >
                       <div>
                         <div className="font-bold text-slate-800 group-hover:text-emerald-700">🧑‍🏫 Sudesh Yadav</div>
-                        <div className="text-[10px] text-slate-500">sudesh@gmail.com • Trainer</div>
+                        <div className="text-[10px] text-slate-500">sudesh@gmail.com • Data Analytics &amp; Data Science</div>
                       </div>
                       {user.email === 'sudesh@gmail.com' && <span className="w-2 h-2 rounded-full bg-emerald-600"></span>}
                     </button>
