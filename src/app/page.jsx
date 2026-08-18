@@ -1,481 +1,335 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import StatCard from '@/components/StatCard';
 import CreateBatchModal from '@/components/Modals/CreateBatchModal';
-import AddTrainerModal from '@/components/Modals/AddTrainerModal';
 import EnrollStudentModal from '@/components/Modals/EnrollStudentModal';
 import BatchDetailModal from '@/components/Modals/BatchDetailModal';
-import LogSessionModal from '@/components/Modals/LogSessionModal';
 import {
-  Layers,
-  Users,
-  GraduationCap,
-  Calendar,
+  Plus,
   Clock,
-  PlusCircle,
-  UserPlus,
+  Calendar,
+  Users,
+  MapPin,
+  Trash2,
+  Edit,
+  Eye,
   ShieldCheck,
   UserCheck,
-  ChevronRight,
-  MapPin,
   Sparkles,
   BookOpen,
-  ArrowUpRight
+  CheckCircle2,
+  ChevronRight,
 } from 'lucide-react';
-import Link from 'next/link';
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const { user, loading: authLoading, isCounselor, isTrainer } = useAuth();
-  const { showError } = useToast();
+export default function Dashboard() {
+  const { user, isCounselor, isTrainer } = useAuth();
+  const { showSuccess, showError } = useToast();
 
-  const [statsData, setStatsData] = useState(null);
   const [trainers, setTrainers] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Modals state
-  const [isCreateBatchOpen, setIsCreateBatchOpen] = useState(false);
-  const [isAddTrainerOpen, setIsAddTrainerOpen] = useState(false);
-  const [isEnrollStudentOpen, setIsEnrollStudentOpen] = useState(false);
-  const [selectedBatchForEnroll, setSelectedBatchForEnroll] = useState(null);
-  const [selectedBatchForDetail, setSelectedBatchForDetail] = useState(null);
-  const [isLogSessionOpen, setIsLogSessionOpen] = useState(false);
-  const [selectedBatchForLog, setSelectedBatchForLog] = useState(null);
+  const [showCreateBatch, setShowCreateBatch] = useState(false);
+  const [preselectedTrainer, setPreselectedTrainer] = useState(null);
+  const [editBatchData, setEditBatchData] = useState(null);
 
-  const fetchDashboardData = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [enrollBatchId, setEnrollBatchId] = useState(null);
+
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailBatchId, setDetailBatchId] = useState(null);
+
+  const fetchData = useCallback(async () => {
     try {
-      const [statsRes, trainersRes, coursesRes] = await Promise.all([
-        fetch('/api/stats'),
+      setLoading(true);
+      const [trRes, btRes] = await Promise.all([
         fetch('/api/trainers'),
-        fetch('/api/courses'),
+        fetch('/api/batches'),
       ]);
+      const trData = await trRes.json();
+      const btData = await btRes.json();
 
-      const statsJson = await statsRes.json();
-      const trainersJson = await trainersRes.json();
-      const coursesJson = await coursesRes.json();
-
-      if (statsJson.success) setStatsData(statsJson.stats);
-      if (trainersJson.success) setTrainers(trainersJson.trainers);
-      if (coursesJson.success) setCourses(coursesJson.courses);
+      if (trData.trainers) setTrainers(trData.trainers);
+      if (btData.batches) setBatches(btData.batches);
     } catch (err) {
-      showError('Failed to load dashboard metrics');
+      console.error('Failed to load dashboard data:', err);
     } finally {
       setLoading(false);
     }
-  }, [user, showError]);
+  }, []);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    } else if (user) {
-      fetchDashboardData();
-    }
-  }, [user, authLoading, router, fetchDashboardData]);
+    fetchData();
+  }, [fetchData]);
 
-  if (authLoading || (!user && loading)) {
+  const handleDeleteBatch = async (batchId, batchName) => {
+    if (!confirm(`Are you sure you want to delete batch "${batchName}"?`)) return;
+    try {
+      const res = await fetch(`/api/batches/${batchId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete batch');
+      showSuccess(data.message || 'Batch deleted');
+      fetchData();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  const handleOpenCreateForTrainer = (trainerId) => {
+    setEditBatchData(null);
+    setPreselectedTrainer(trainerId);
+    setShowCreateBatch(true);
+  };
+
+  const handleOpenEditBatch = (batch) => {
+    setEditBatchData(batch);
+    setPreselectedTrainer(batch.trainer_id);
+    setShowCreateBatch(true);
+  };
+
+  const handleOpenEnroll = (batchId) => {
+    setEnrollBatchId(batchId);
+    setShowEnrollModal(true);
+  };
+
+  const handleOpenDetail = (batchId) => {
+    setDetailBatchId(batchId);
+    setShowDetailModal(true);
+  };
+
+  if (loading) {
     return (
-      <div className="py-24 text-center">
-        <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-3 text-xs text-slate-500 font-semibold">Loading SSSAM Portal...</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
+          <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+          <span>Loading batch schedule...</span>
+        </div>
       </div>
     );
   }
 
-  if (!user) return null;
+  // Split batches by trainer
+  const mohitTrainer = trainers.find(t => t.name?.toLowerCase().includes('mohit'));
+  const sudeshTrainer = trainers.find(t => t.name?.toLowerCase().includes('sudesh'));
+
+  const mohitBatches = batches.filter(b => b.trainer_name?.toLowerCase().includes('mohit') || (mohitTrainer && b.trainer_id === mohitTrainer.id));
+  const sudeshBatches = batches.filter(b => b.trainer_name?.toLowerCase().includes('sudesh') || (sudeshTrainer && b.trainer_id === sudeshTrainer.id));
+
+  // If logged in as trainer, filter only their own
+  const myBatches = isTrainer
+    ? batches.filter(b => b.trainer_name?.toLowerCase().includes(user?.name?.toLowerCase()))
+    : batches;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in max-w-7xl mx-auto pb-12">
       
-      {/* Welcome Banner */}
-      <div className={`p-6 sm:p-8 rounded-3xl border shadow-sm relative overflow-hidden ${
-        isCounselor
-          ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 text-white border-slate-800'
-          : 'bg-gradient-to-r from-slate-900 via-teal-950 to-emerald-950 text-white border-slate-800'
-      }`}>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                isCounselor ? 'bg-purple-500/30 text-purple-200 border border-purple-400/30' : 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/30'
-              }`}>
-                {isCounselor ? '👑 Counselor Admin Console' : '🧑‍🏫 Trainer Faculty Portal'}
-              </span>
-              <span className="text-xs text-slate-300 font-medium">• Academic Session 2026</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Welcome, {user.name}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-              {isCounselor
-                ? 'Full administrative control over trainer assignments, batch schedules, timings, capacity, and student roster enrollments.'
-                : `Assigned Trainer for ${user.specialization || 'Academic Batches'}. Track your daily timings, view enrolled students, and enroll new students.`}
-            </p>
+      {/* Top Banner */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-wider uppercase bg-purple-100 text-purple-800">
+              {isCounselor ? '👑 Counselor Portal' : '🧑‍🏫 Trainer Portal'}
+            </span>
+            <span className="text-xs text-slate-400 font-medium">SSSAM Institute</span>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {isCounselor ? (
-              <>
-                <button
-                  onClick={() => setIsCreateBatchOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-md shadow-purple-600/30 transition-all"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>Create Batch</span>
-                </button>
-                <button
-                  onClick={() => setIsAddTrainerOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold rounded-xl backdrop-blur-xs transition-all"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>Add Trainer</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    setSelectedBatchForEnroll(statsData?.myBatches?.[0]?.id || null);
-                    setIsEnrollStudentOpen(true);
-                  }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/30 transition-all"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>Add Student to My Batch</span>
-                </button>
-                <Link
-                  href="/batches"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold rounded-xl backdrop-blur-xs transition-all"
-                >
-                  <Layers className="w-4 h-4" />
-                  <span>My Batches</span>
-                </Link>
-              </>
-            )}
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {isCounselor ? 'Trainer Batches & Timetable Management' : `Welcome, ${user?.name}!`}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            {isCounselor
+              ? 'Easily view, assign, and track batch timings for Mohit Yadav & Sudesh Yadav'
+              : 'Here are your active batches, class timings, and enrolled students.'}
+          </p>
         </div>
-      </div>
 
-      {/* Metrics Row */}
-      {isCounselor ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Total Batches"
-            value={statsData?.totalBatches || 0}
-            subtitle={`${statsData?.ongoingBatches || 0} Ongoing • ${statsData?.upcomingBatches || 0} Upcoming`}
-            icon={Layers}
-            color="indigo"
-          />
-          <StatCard
-            title="Active Trainers"
-            value={statsData?.activeTrainers || 0}
-            subtitle={`Faculty members scheduled`}
-            icon={Users}
-            color="purple"
-          />
-          <StatCard
-            title="Total Students"
-            value={statsData?.totalStudents || 0}
-            subtitle={`${statsData?.totalEnrollments || 0} Total batch enrollments`}
-            icon={GraduationCap}
-            color="emerald"
-          />
-          <StatCard
-            title="Master Timetable"
-            value={`${statsData?.ongoingBatches || 0} Slots`}
-            subtitle="View full daily schedule"
-            icon={Clock}
-            color="amber"
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard
-            title="My Assigned Batches"
-            value={statsData?.totalMyBatches || 0}
-            subtitle={`${statsData?.ongoingMyBatches || 0} Active Ongoing`}
-            icon={Layers}
-            color="emerald"
-          />
-          <StatCard
-            title="My Enrolled Students"
-            value={statsData?.totalMyStudents || 0}
-            subtitle="Students across your batches"
-            icon={GraduationCap}
-            color="indigo"
-          />
-          <StatCard
-            title="Daily Status"
-            value="Active"
-            subtitle={`${statsData?.ongoingMyBatches || 0} sessions running`}
-            icon={Clock}
-            color="amber"
-          />
-        </div>
-      )}
-
-      {/* Counselor Dashboard Sections */}
-      {isCounselor && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Active Batches & Schedule List */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-indigo-600" />
-                  <span>Active Batches &amp; Timings Overview</span>
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Batches currently running with trainer allocations &amp; seat occupancy
-                </p>
-              </div>
-              <Link
-                href="/batches"
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-              >
-                <span>View All</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {statsData?.recentBatches?.map((batch) => {
-                const occupancy = Math.round(((batch.student_count || 0) / batch.max_capacity) * 100);
-                return (
-                  <div
-                    key={batch.id}
-                    onClick={() => setSelectedBatchForDetail(batch.id)}
-                    className="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all group relative overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
-                        {batch.batch_code}
-                      </span>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                        batch.status === 'Ongoing'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}>
-                        {batch.status}
-                      </span>
-                    </div>
-
-                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
-                      {batch.batch_name}
-                    </h4>
-
-                    <div className="mt-3 space-y-1.5 text-[11px] text-slate-600">
-                      <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                        <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                        <span>{batch.start_time} - {batch.end_time}</span>
-                        <span className="text-[10px] font-normal text-slate-500">({batch.days})</span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <Users className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                        <span>Trainer: <strong>{batch.trainer_name || 'Unassigned'}</strong></span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-slate-500 text-[10px]">
-                        <MapPin className="w-3 h-3 text-slate-400" />
-                        <span>{batch.mode}</span>
-                      </div>
-                    </div>
-
-                    {/* Mini capacity bar */}
-                    <div className="mt-3 pt-2 border-t border-slate-100">
-                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                        <span>Enrollment</span>
-                        <span className="font-semibold text-slate-800">{batch.student_count || 0}/{batch.max_capacity} ({occupancy}%)</span>
-                      </div>
-                      <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                        <div
-                          className="h-full bg-indigo-500 rounded-full"
-                          style={{ width: `${Math.min(occupancy, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Trainer Workload Sidebar */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-purple-600" />
-                  <span>Trainer Allocations</span>
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Batches assigned per trainer
-                </p>
-              </div>
-              <Link
-                href="/trainers"
-                className="text-xs font-semibold text-purple-600 hover:text-purple-800 flex items-center gap-1"
-              >
-                <span>Manage</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3 shadow-xs">
-              {statsData?.trainerWorkload?.map((tr) => (
-                <div
-                  key={tr.id}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-purple-50/50 hover:border-purple-200 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-bold text-xs text-slate-900">
-                      {tr.name}
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
-                      {tr.batch_count || 0} Batches
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5 truncate">
-                    {tr.specialization}
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-[10px] text-slate-600 font-medium">
-                    <span>{tr.ongoing_count || 0} Ongoing batches</span>
-                    <span>{tr.total_students || 0} Students</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {/* Trainer Dashboard View */}
-      {isTrainer && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-600" />
-                <span>My Assigned Batches &amp; Daily Schedule</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                Classroom timings, student rosters, and quick student enrollment
-              </p>
-            </div>
+        {/* Action Buttons for Counselor */}
+        {isCounselor && (
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               onClick={() => {
-                setSelectedBatchForEnroll(statsData?.myBatches?.[0]?.id || null);
-                setIsEnrollStudentOpen(true);
+                setEditBatchData(null);
+                setPreselectedTrainer(null);
+                setShowCreateBatch(true);
               }}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02]"
             >
-              <UserPlus className="w-4 h-4" />
-              <span>Add Student</span>
+              <Plus className="w-4 h-4" />
+              <span>Create New Batch</span>
+            </button>
+            <button
+              onClick={() => {
+                setEnrollBatchId(null);
+                setShowEnrollModal(true);
+              }}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md transition-all hover:scale-[1.02]"
+            >
+              <Users className="w-4 h-4" />
+              <span>Enroll Student</span>
             </button>
           </div>
+        )}
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {statsData?.myBatches?.map((batch) => {
-              const occupancy = Math.round(((batch.student_count || 0) / batch.max_capacity) * 100);
-              return (
-                <div
-                  key={batch.id}
-                  className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all group flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100">
-                        {batch.batch_code}
-                      </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        {batch.status}
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                      {batch.batch_name}
-                    </h4>
-                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">{batch.course_name}</p>
-
-                    <div className="mt-4 space-y-2 text-xs">
-                      <div className="flex items-center gap-2 font-bold text-slate-800 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                        <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>{batch.start_time} - {batch.end_time}</span>
-                        <span className="text-slate-400 font-normal">({batch.days})</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-slate-600 px-1">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>{batch.mode}</span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs px-1 pt-1 font-semibold text-slate-700">
-                        <span>Students Enrolled:</span>
-                        <span>{batch.student_count || 0} / {batch.max_capacity}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => setSelectedBatchForDetail(batch.id)}
-                      className="py-1.5 px-3 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg text-center transition-colors"
-                    >
-                      View Students
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedBatchForLog(batch);
-                        setIsLogSessionOpen(true);
-                      }}
-                      className="py-1.5 px-3 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-center transition-colors"
-                    >
-                      Log Session
-                    </button>
-                  </div>
+      {/* COUNSELOR VIEW: 2 Dedicated Sections for Mohit & Sudesh */}
+      {isCounselor && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* SECTION 1: Mohit Yadav */}
+          <div className="bg-white rounded-3xl border border-indigo-100 shadow-md p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-indigo-500/20">
+                  MY
                 </div>
-              );
-            })}
-          </div>
+                <div>
+                  <h2 className="text-lg font-black text-slate-900">
+                    Mohit Yadav (Trainer)
+                  </h2>
+                  <p className="text-xs text-indigo-600 font-bold">
+                    {mohitBatches.length} Active Batch{mohitBatches.length !== 1 ? 'es' : ''} Assigned
+                  </p>
+                </div>
+              </div>
 
-          {/* Recent Session Logs */}
-          {statsData?.recentLogs?.length > 0 && (
-            <div className="mt-8 space-y-3">
-              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-emerald-600" />
-                <span>My Recent Class Activity Logs</span>
-              </h3>
-              <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
-                {statsData.recentLogs.map((log) => (
-                  <div key={log.id} className="p-4 flex items-start justify-between gap-4 text-xs">
-                    <div>
-                      <div className="flex items-center gap-2 font-bold text-slate-900">
-                        <span>{log.batch_name}</span>
-                        <span className="font-normal text-slate-400">• {log.log_date}</span>
-                      </div>
-                      <div className="text-slate-700 font-semibold mt-1">
-                        Topic: {log.topic}
-                      </div>
-                      {log.notes && <div className="text-slate-500 mt-0.5">{log.notes}</div>}
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-bold text-[11px]">
-                        {log.attendance_count} Present
-                      </span>
-                    </div>
-                  </div>
+              <button
+                onClick={() => handleOpenCreateForTrainer(mohitTrainer?.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-xs transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Batch</span>
+              </button>
+            </div>
+
+            {/* Mohit Batches List */}
+            {mohitBatches.length === 0 ? (
+              <div className="text-center py-10 px-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+                <Clock className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs font-bold text-slate-700">No batches assigned to Mohit Yadav yet</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Click "Add Batch" to allocate a time slot</p>
+                <button
+                  onClick={() => handleOpenCreateForTrainer(mohitTrainer?.id)}
+                  className="mt-3 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Create Batch for Mohit</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {mohitBatches.map((batch) => (
+                  <BatchCard
+                    key={batch.id}
+                    batch={batch}
+                    isCounselor={isCounselor}
+                    onOpenDetail={handleOpenDetail}
+                    onOpenEnroll={handleOpenEnroll}
+                    onOpenEdit={handleOpenEditBatch}
+                    onDelete={handleDeleteBatch}
+                  />
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* SECTION 2: Sudesh Yadav */}
+          <div className="bg-white rounded-3xl border border-emerald-100 shadow-md p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-emerald-500/20">
+                  SY
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-slate-900">
+                    Sudesh Yadav (Trainer)
+                  </h2>
+                  <p className="text-xs text-emerald-600 font-bold">
+                    {sudeshBatches.length} Active Batch{sudeshBatches.length !== 1 ? 'es' : ''} Assigned
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleOpenCreateForTrainer(sudeshTrainer?.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Batch</span>
+              </button>
+            </div>
+
+            {/* Sudesh Batches List */}
+            {sudeshBatches.length === 0 ? (
+              <div className="text-center py-10 px-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+                <Clock className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs font-bold text-slate-700">No batches assigned to Sudesh Yadav yet</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Click "Add Batch" to allocate a time slot</p>
+                <button
+                  onClick={() => handleOpenCreateForTrainer(sudeshTrainer?.id)}
+                  className="mt-3 px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Create Batch for Sudesh</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sudeshBatches.map((batch) => (
+                  <BatchCard
+                    key={batch.id}
+                    batch={batch}
+                    isCounselor={isCounselor}
+                    onOpenDetail={handleOpenDetail}
+                    onOpenEnroll={handleOpenEnroll}
+                    onOpenEdit={handleOpenEditBatch}
+                    onDelete={handleDeleteBatch}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+
+      {/* TRAINER VIEW: Personal Schedule */}
+      {isTrainer && (
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h2 className="text-xl font-black text-slate-900">
+                My Assigned Batches &amp; Class Timings
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                You can view timings and add new students to your batches.
+              </p>
+            </div>
+            <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+              {myBatches.length} Batches Active
+            </div>
+          </div>
+
+          {myBatches.length === 0 ? (
+            <div className="text-center py-12 px-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
+              <Clock className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm font-bold text-slate-700">No active batches assigned to you right now</p>
+              <p className="text-xs text-slate-400 mt-1">Counselor Saloni will allocate your batch timings soon.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {myBatches.map((batch) => (
+                <BatchCard
+                  key={batch.id}
+                  batch={batch}
+                  isCounselor={false}
+                  onOpenDetail={handleOpenDetail}
+                  onOpenEnroll={handleOpenEnroll}
+                  onOpenEdit={null}
+                  onDelete={null}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -483,46 +337,126 @@ export default function DashboardPage() {
 
       {/* Modals */}
       <CreateBatchModal
-        isOpen={isCreateBatchOpen}
-        onClose={() => setIsCreateBatchOpen(false)}
-        onSuccess={fetchDashboardData}
-        trainers={trainers}
-        courses={courses}
-      />
-
-      <AddTrainerModal
-        isOpen={isAddTrainerOpen}
-        onClose={() => setIsAddTrainerOpen(false)}
-        onSuccess={fetchDashboardData}
+        isOpen={showCreateBatch}
+        onClose={() => setShowCreateBatch(false)}
+        onSuccess={fetchData}
+        editBatch={editBatchData}
+        preselectedTrainerId={preselectedTrainer}
       />
 
       <EnrollStudentModal
-        isOpen={isEnrollStudentOpen}
-        onClose={() => setIsEnrollStudentOpen(false)}
-        onSuccess={fetchDashboardData}
-        defaultBatchId={selectedBatchForEnroll}
-        batches={isCounselor ? (statsData?.recentBatches || []) : (statsData?.myBatches || [])}
+        isOpen={showEnrollModal}
+        onClose={() => setShowEnrollModal(false)}
+        onSuccess={fetchData}
+        defaultBatchId={enrollBatchId}
       />
 
       <BatchDetailModal
-        batchId={selectedBatchForDetail}
-        isOpen={!!selectedBatchForDetail}
-        onClose={() => setSelectedBatchForDetail(null)}
-        onOpenEnrollStudent={(bId) => {
-          setSelectedBatchForEnroll(bId);
-          setIsEnrollStudentOpen(true);
-        }}
-        onDataChanged={fetchDashboardData}
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        batchId={detailBatchId}
+        onBatchUpdated={fetchData}
       />
 
-      <LogSessionModal
-        isOpen={isLogSessionOpen}
-        onClose={() => setIsLogSessionOpen(false)}
-        onSuccess={fetchDashboardData}
-        batchId={selectedBatchForLog?.id}
-        batchName={selectedBatchForLog?.batch_name}
-        currentEnrolled={selectedBatchForLog?.student_count}
-      />
+    </div>
+  );
+}
+
+// Single Clean Batch Card Component
+function BatchCard({ batch, isCounselor, onOpenDetail, onOpenEnroll, onOpenEdit, onDelete }) {
+  const isWeekend = batch.days?.toLowerCase().includes('sat') || batch.days?.toLowerCase().includes('sun');
+
+  return (
+    <div className="bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl p-4 transition-all group">
+      
+      {/* Top Details */}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-slate-900">
+              {batch.batch_name}
+            </span>
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-purple-100 text-purple-800">
+              {batch.batch_code}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
+            {batch.course_name}
+          </p>
+        </div>
+
+        {/* Status Badge */}
+        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+          {batch.status}
+        </span>
+      </div>
+
+      {/* Timing & Days Pill */}
+      <div className="mt-3.5 grid grid-cols-2 gap-2 text-xs">
+        <div className="flex items-center gap-1.5 bg-white p-2 rounded-xl border border-slate-200/60 font-bold text-slate-800">
+          <Clock className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+          <span>{batch.start_time} - {batch.end_time}</span>
+        </div>
+
+        <div className="flex items-center gap-1.5 bg-white p-2 rounded-xl border border-slate-200/60 font-bold text-slate-800">
+          <Calendar className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+          <span className="truncate">{isWeekend ? 'Weekend (Sat-Sun)' : 'Weekdays (Mon-Thu)'}</span>
+        </div>
+      </div>
+
+      {/* Room & Students */}
+      <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500 px-1">
+        <div className="flex items-center gap-1">
+          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+          <span>{batch.mode || 'Lab 1'}</span>
+        </div>
+
+        <div className="flex items-center gap-1 font-bold text-slate-700">
+          <Users className="w-3.5 h-3.5 text-slate-400" />
+          <span>{batch.student_count || 0} / {batch.max_capacity || 25} Students</span>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-3.5 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => onOpenDetail(batch.id)}
+            className="px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-200/60 border border-slate-200 rounded-lg transition-colors flex items-center gap-1"
+          >
+            <Eye className="w-3 h-3 text-slate-500" />
+            <span>Students ({batch.student_count || 0})</span>
+          </button>
+
+          <button
+            onClick={() => onOpenEnroll(batch.id)}
+            className="px-2.5 py-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors flex items-center gap-1"
+          >
+            <Plus className="w-3 h-3" />
+            <span>Add Student</span>
+          </button>
+        </div>
+
+        {/* Counselor Edit & Delete */}
+        {isCounselor && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onOpenEdit(batch)}
+              className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              title="Edit Batch"
+            >
+              <Edit className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => onDelete(batch.id, batch.batch_name)}
+              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+              title="Delete Batch"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
 
     </div>
   );

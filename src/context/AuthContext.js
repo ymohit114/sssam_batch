@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext(null);
 
@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   const fetchSession = useCallback(async () => {
     try {
@@ -60,8 +59,12 @@ export function AuthProvider({ children }) {
   const switchDemoUser = async (targetRole) => {
     setLoading(true);
     try {
-      if (targetRole === 'counselor') {
+      if (targetRole === 'counselor' || targetRole === 'saloni') {
         await login('saloni@gmail.com', '1234567890');
+      } else if (targetRole === 'mohit') {
+        await login('mohit@gmail.com', '1234567890');
+      } else if (targetRole === 'sudesh') {
+        await login('sudesh@gmail.com', '1234567890');
       }
     } catch (err) {
       console.error('Demo switch error:', err);
