@@ -291,24 +291,10 @@ export default function BatchesPage() {
                     </div>
                   </div>
 
-                  {/* Capacity Bar */}
-                  <div className="mt-4 space-y-1">
-                    <div className="flex justify-between text-[11px] font-semibold text-slate-600">
-                      <span>Seat Occupancy</span>
-                      <span className="text-slate-900 font-bold">{batch.student_count || 0} / {batch.max_capacity} ({occupancy}%)</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          occupancy > 90
-                            ? 'bg-rose-500'
-                            : occupancy > 70
-                            ? 'bg-amber-500'
-                            : 'bg-indigo-500'
-                        }`}
-                        style={{ width: `${Math.min(occupancy, 100)}%` }}
-                      />
-                    </div>
+                  {/* Enrolled Students Count */}
+                  <div className="mt-4 flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-bold">
+                    <span>Enrolled Students</span>
+                    <span className="text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">{batch.student_count || 0} Students</span>
                   </div>
                 </div>
 

@@ -182,28 +182,6 @@ export default function BatchDetailModal({
                 </div>
               </div>
 
-              {/* Capacity Progress Bar */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-700">Batch Capacity &amp; Enrollment</span>
-                  <span className="font-extrabold text-slate-900">
-                    {batchData.student_count} / {batchData.max_capacity} Seats ({occupancy}% filled)
-                  </span>
-                </div>
-                <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-500 ${
-                      occupancy > 90
-                        ? 'bg-rose-500'
-                        : occupancy > 70
-                        ? 'bg-amber-500'
-                        : 'bg-emerald-500'
-                    }`}
-                    style={{ width: `${Math.min(occupancy, 100)}%` }}
-                  />
-                </div>
-              </div>
-
               {/* Student Roster Section */}
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -235,9 +213,8 @@ export default function BatchDetailModal({
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
                       <tr>
                         <th className="px-4 py-3">Student Name</th>
-                        <th className="px-4 py-3">Roll No</th>
                         <th className="px-4 py-3">Contact</th>
-                        <th className="px-4 py-3">City</th>
+                        <th className="px-4 py-3">Course / Subject</th>
                         <th className="px-4 py-3">Enrolled At</th>
                         <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
@@ -245,7 +222,7 @@ export default function BatchDetailModal({
                     <tbody className="divide-y divide-slate-100 bg-white">
                       {batchData.students?.length === 0 ? (
                         <tr>
-                          <td colSpan="6" className="px-4 py-8 text-center text-slate-400">
+                          <td colSpan="5" className="px-4 py-8 text-center text-slate-400">
                             No students enrolled in this batch yet. Click "Add Student to Batch" above to enroll.
                           </td>
                         </tr>
@@ -255,15 +232,13 @@ export default function BatchDetailModal({
                             <td className="px-4 py-3 font-bold text-slate-900">
                               {student.name}
                             </td>
-                            <td className="px-4 py-3 font-mono text-slate-600 font-medium">
-                              {student.enrollment_no}
+                            <td className="px-4 py-3 text-slate-700 font-bold">
+                              {student.phone}
                             </td>
-                            <td className="px-4 py-3 text-slate-600">
-                              <div>{student.phone}</div>
-                              {student.email && <div className="text-[10px] text-slate-400">{student.email}</div>}
-                            </td>
-                            <td className="px-4 py-3 text-slate-600">
-                              {student.city || 'Delhi'}
+                            <td className="px-4 py-3 text-purple-700 font-bold">
+                              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
+                                {student.course_name || batchData.batch_name || 'Course'}
+                              </span>
                             </td>
                             <td className="px-4 py-3 text-slate-500 text-[11px]">
                               {student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString() : 'Active'}
