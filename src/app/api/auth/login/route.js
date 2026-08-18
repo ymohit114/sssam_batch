@@ -1,8 +1,8 @@
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
-import { signToken, errorResponse, successResponse } from '@/lib/auth';
+import { signToken, errorResponse } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
@@ -39,8 +39,16 @@ export async function POST(request) {
 
     const token = signToken(payload);
 
-    const cookieStore = cookies();
-    cookieStore.set('sssam_auth_token', token, {
+    const response = NextResponse.json({
+      success: true,
+      message: 'Login successful',
+      user: payload,
+      token,
+    }, { status: 200 });
+
+    response.cookies.set({
+      name: 'sssam_auth_token',
+      value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -48,13 +56,9 @@ export async function POST(request) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return successResponse({
-      message: 'Login successful',
-      user: payload,
-      token,
-    });
+    return response;
   } catch (err) {
     console.error('Login error:', err);
-    return errorResponse('An internal server error occurred', 500);
+    return errorResponse(err.message || 'An internal server error occurred', 500);
   }
 }

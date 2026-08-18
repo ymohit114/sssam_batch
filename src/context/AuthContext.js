@@ -12,7 +12,15 @@ export function AuthProvider({ children }) {
 
   const fetchSession = useCallback(async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const headers = {};
+      if (typeof window !== 'undefined') {
+        const localToken = localStorage.getItem('sssam_auth_token');
+        if (localToken) {
+          headers['Authorization'] = `Bearer ${localToken}`;
+        }
+      }
+
+      const res = await fetch('/api/auth/me', { headers });
       const data = await res.json();
       if (res.ok && data.user) {
         setUser(data.user);
@@ -42,6 +50,10 @@ export function AuthProvider({ children }) {
       throw new Error(data.error || 'Login failed');
     }
 
+    if (typeof window !== 'undefined' && data.token) {
+      localStorage.setItem('sssam_auth_token', data.token);
+    }
+
     setUser(data.user);
     return data.user;
   };
@@ -51,6 +63,9 @@ export function AuthProvider({ children }) {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch (e) {
       // ignore
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sssam_auth_token');
     }
     setUser(null);
     router.push('/login');
