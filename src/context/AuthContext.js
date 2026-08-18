@@ -57,16 +57,11 @@ export function AuthProvider({ children }) {
     router.push('/login');
   };
 
-  // Quick switcher for demo testing
   const switchDemoUser = async (targetRole) => {
     setLoading(true);
     try {
       if (targetRole === 'counselor') {
         await login('saloni@gmail.com', '1234567890');
-      } else if (targetRole === 'trainer1') {
-        await login('rahul.sharma@sssam.com', 'trainer123');
-      } else if (targetRole === 'trainer2') {
-        await login('priya.singh@sssam.com', 'trainer123');
       }
     } catch (err) {
       console.error('Demo switch error:', err);

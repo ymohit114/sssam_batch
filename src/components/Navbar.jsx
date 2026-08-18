@@ -102,34 +102,6 @@ export default function Navbar() {
                       </div>
                       {isCounselor && <span className="w-2 h-2 rounded-full bg-purple-600"></span>}
                     </button>
-
-                    <button
-                      onClick={() => {
-                        switchDemoUser('trainer1');
-                        setShowDemoMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-emerald-50 flex items-center justify-between group transition-colors"
-                    >
-                      <div>
-                        <div className="font-semibold text-slate-800 group-hover:text-emerald-700">🧑‍🏫 Rahul Sharma</div>
-                        <div className="text-[11px] text-slate-500">Trainer (Full Stack Web Dev)</div>
-                      </div>
-                      {user.email === 'rahul.sharma@sssam.com' && <span className="w-2 h-2 rounded-full bg-emerald-600"></span>}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        switchDemoUser('trainer2');
-                        setShowDemoMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-emerald-50 flex items-center justify-between group transition-colors"
-                    >
-                      <div>
-                        <div className="font-semibold text-slate-800 group-hover:text-emerald-700">👩‍🏫 Priya Singh</div>
-                        <div className="text-[11px] text-slate-500">Trainer (Data Science & AI)</div>
-                      </div>
-                      {user.email === 'priya.singh@sssam.com' && <span className="w-2 h-2 rounded-full bg-emerald-600"></span>}
-                    </button>
                   </div>
                 </>
               )}

@@ -96,46 +96,6 @@ export default function LoginPage() {
               </div>
               <ArrowRight className="w-3.5 h-3.5 text-purple-600 group-hover:translate-x-0.5 transition-transform" />
             </button>
-
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('rahul.sharma@sssam.com', 'trainer123')}
-              disabled={loading}
-              className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-emerald-50 border border-emerald-200 text-left transition-all group shadow-2xs hover:shadow-xs"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs">
-                  <UserCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
-                    Trainer: Rahul Sharma
-                  </div>
-                  <div className="text-[10px] text-slate-500">Full Stack Batches • Add Students Only</div>
-                </div>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('priya.singh@sssam.com', 'trainer123')}
-              disabled={loading}
-              className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-emerald-50 border border-emerald-200 text-left transition-all group shadow-2xs hover:shadow-xs"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs">
-                  <UserCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
-                    Trainer: Priya Singh
-                  </div>
-                  <div className="text-[10px] text-slate-500">Data Science Batches • Add Students Only</div>
-                </div>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
-            </button>
           </div>
         </div>
 
