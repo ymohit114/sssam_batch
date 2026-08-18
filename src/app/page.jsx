@@ -437,7 +437,7 @@ function BatchCard({ batch, isCounselor, onOpenDetail, onOpenEnroll, onOpenEdit,
       <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500 px-1">
         <div className="flex items-center gap-1 font-bold text-slate-700">
           <Users className="w-3.5 h-3.5 text-slate-400" />
-          <span>{batch.student_count || 0} / {batch.max_capacity || 25} Enrolled Students</span>
+          <span>{batch.student_count || 0} Enrolled Student{batch.student_count !== 1 ? 's' : ''}</span>
         </div>
       </div>
 
