@@ -112,28 +112,20 @@ export async function POST(request) {
       ignore_conflict,
     } = data;
 
+    let finalBatchName = batch_name ? batch_name.trim() : `Batch (${start_time} - ${end_time})`;
     let finalBatchCode = batch_code ? batch_code.trim().toUpperCase() : '';
-    let finalBatchName = batch_name ? batch_name.trim() : '';
 
-    if (course_id) {
-      const course = await Course.findById(course_id);
-      if (course) {
-        if (!finalBatchName) {
-          finalBatchName = `${course.name} (${start_time} - ${end_time})`;
-        }
-        if (!finalBatchCode) {
-          const count = await Batch.countDocuments({ course: course_id });
-          const year = new Date().getFullYear();
-          finalBatchCode = `${course.code}-${year}-B${count + 1}`;
-        }
-      }
+    if (!finalBatchCode && finalBatchName) {
+      // Derive initials from batch name (e.g. "Full Stack Web" -> "FSW", "Python DSA" -> "PDSA")
+      const words = finalBatchName.split(/\s+/).filter(w => w.length > 0);
+      const initials = words.map(w => w[0].toUpperCase()).join('').slice(0, 5) || 'BATCH';
+      const year = new Date().getFullYear();
+      const count = await Batch.countDocuments();
+      finalBatchCode = `${initials}-${year}-B${count + 1}`;
     }
 
     if (!finalBatchCode) {
       finalBatchCode = `BATCH-${Date.now().toString().slice(-4)}`;
-    }
-    if (!finalBatchName) {
-      finalBatchName = `Batch (${start_time} - ${end_time})`;
     }
 
     if (!start_date || !start_time || !end_time || !days) {

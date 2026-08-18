@@ -224,24 +224,19 @@ export default function CreateBatchModal({ isOpen, onClose, onSuccess, editBatch
             </div>
           </div>
 
-          {/* Course / Subject */}
+          {/* Batch Name / Subject Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Course / Subject *
+              Batch Name / Subject *
             </label>
-            <select
+            <input
+              type="text"
               required
-              value={formData.course_id}
-              onChange={(e) => setFormData({ ...formData, course_id: e.target.value })}
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white font-medium"
-            >
-              <option value="">-- Select Course --</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.code})
-                </option>
-              ))}
-            </select>
+              placeholder="e.g. Full Stack Web Development, Python DSA, React Morning"
+              value={formData.batch_name}
+              onChange={(e) => setFormData({ ...formData, batch_name: e.target.value })}
+              className="w-full px-3.5 py-2.5 text-xs font-semibold border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder:text-slate-400"
+            />
           </div>
 
           {/* Daily Timing */}
