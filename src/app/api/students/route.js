@@ -56,6 +56,7 @@ export async function GET(request) {
       name: s.name,
       email: s.email,
       phone: s.phone,
+      course_name: s.course_name || '',
       enrollment_no: s.enrollment_no,
       city: s.city,
       status: s.status,
@@ -79,7 +80,7 @@ export async function POST(request) {
     if (!user) return errorResponse('Unauthorized', 401);
 
     const data = await request.json();
-    const { name, email, phone, city, batch_id, notes, enrollment_no } = data;
+    const { name, email, phone, course_name, city, batch_id, notes, enrollment_no } = data;
 
     if (!name || name.trim().length === 0) {
       return errorResponse('Student name is required', 400);
@@ -100,26 +101,32 @@ export async function POST(request) {
 
     // Check if student with same email or phone exists
     let student = null;
-    if (email && email.trim()) {
-      student = await Student.findOne({ email: email.trim().toLowerCase() });
-    }
-    if (!student && phone && phone.trim()) {
+    if (phone && phone.trim()) {
       student = await Student.findOne({ phone: phone.trim() });
+    }
+    if (!student && email && email.trim()) {
+      student = await Student.findOne({ email: email.trim().toLowerCase() });
     }
 
     if (!student) {
       const roll = enrollment_no && enrollment_no.trim() ? enrollment_no.trim().toUpperCase() : await generateEnrollmentNo();
       student = await Student.create({
         name: name.trim(),
-        email: email ? email.trim().toLowerCase() : null,
         phone: phone ? phone.trim() : null,
+        course_name: course_name ? course_name.trim() : '',
+        email: email ? email.trim().toLowerCase() : null,
         enrollment_no: roll,
         city: city ? city.trim() : 'Delhi',
         status: 'active',
         batches: batch_id ? [batch_id] : [],
       });
-    } else if (batch_id && !student.batches.includes(batch_id)) {
-      student.batches.push(batch_id);
+    } else {
+      if (course_name && course_name.trim()) {
+        student.course_name = course_name.trim();
+      }
+      if (batch_id && !student.batches.includes(batch_id)) {
+        student.batches.push(batch_id);
+      }
       await student.save();
     }
 

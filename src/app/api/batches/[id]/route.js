@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
     const batch = await Batch.findById(id)
       .populate('trainer', 'name email phone specialization')
       .populate('course', 'name code color')
-      .populate('students.student', 'name email phone enrollment_no city status')
+      .populate('students.student', 'name email phone course_name enrollment_no city status')
       .populate('students.enrolled_by', 'name')
       .lean();
 
@@ -51,6 +51,7 @@ export async function GET(request, { params }) {
         name: s.student.name,
         email: s.student.email,
         phone: s.student.phone,
+        course_name: s.student.course_name || '',
         enrollment_no: s.student.enrollment_no,
         city: s.student.city,
         status: s.student.status,

@@ -14,6 +14,7 @@ export default function EnrollStudentModal({ isOpen, onClose, onSuccess, default
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    course_name: '',
     batch_id: '',
   });
 
@@ -87,6 +88,7 @@ export default function EnrollStudentModal({ isOpen, onClose, onSuccess, default
       setFormData({
         name: '',
         phone: '',
+        course_name: '',
         batch_id: defaultBatchId || (batchesList[0]?.id ? String(batchesList[0].id) : ''),
       });
       onSuccess();
@@ -129,13 +131,13 @@ export default function EnrollStudentModal({ isOpen, onClose, onSuccess, default
           </button>
         </div>
 
-        {/* Simplified Form (Name, Number, Course/Batch) */}
+        {/* Simplified Form (Batch, Name, Number, Course) */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           
-          {/* Select Batch / Course */}
+          {/* Select Batch / Slot */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Select Batch / Course *
+              Select Batch / Timing *
             </label>
             <select
               required
@@ -178,6 +180,20 @@ export default function EnrollStudentModal({ isOpen, onClose, onSuccess, default
               placeholder="e.g. 9876543210"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full px-3.5 py-2.5 text-xs font-semibold border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+          </div>
+
+          {/* Student Course */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Student Course / Subject
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Full Stack Web Development, Python, CCNA"
+              value={formData.course_name}
+              onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
               className="w-full px-3.5 py-2.5 text-xs font-semibold border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
