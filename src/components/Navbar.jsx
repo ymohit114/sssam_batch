@@ -97,8 +97,8 @@ export default function Navbar() {
                       className="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 flex items-center justify-between group transition-colors"
                     >
                       <div>
-                        <div className="font-semibold text-slate-800 group-hover:text-purple-700">👑 Amit Sharma</div>
-                        <div className="text-[11px] text-slate-500">Counselor (Full Admin Control)</div>
+                        <div className="font-semibold text-slate-800 group-hover:text-purple-700">👑 Saloni</div>
+                        <div className="text-[11px] text-slate-500">saloni@gmail.com • Lead Counselor</div>
                       </div>
                       {isCounselor && <span className="w-2 h-2 rounded-full bg-purple-600"></span>}
                     </button>

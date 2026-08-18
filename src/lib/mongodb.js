@@ -46,17 +46,17 @@ async function initDefaultAdmin() {
     const count = await User.countDocuments();
     if (count === 0) {
       console.log('Initializing clean Counselor Admin account...');
-      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const hashedPassword = await bcrypt.hash('1234567890', 10);
       await User.create({
-        name: 'Amit Sharma',
-        email: 'counselor@sssam.com',
+        name: 'Saloni',
+        email: 'saloni@gmail.com',
         password: hashedPassword,
         role: 'counselor',
         phone: '+91 98765 00001',
-        specialization: 'Academic & Batch Counselor',
+        specialization: 'Lead Academic Counselor',
         status: 'active',
       });
-      console.log('Counselor Admin created: counselor@sssam.com / admin123');
+      console.log('Counselor Admin created: saloni@gmail.com / 1234567890');
 
       // Create standard course categories (clean metadata)
       const Course = (await import('@/models/Course')).default;

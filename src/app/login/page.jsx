@@ -79,7 +79,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 gap-2">
             <button
               type="button"
-              onClick={() => handleQuickLogin('counselor@sssam.com', 'admin123')}
+              onClick={() => handleQuickLogin('saloni@gmail.com', '1234567890')}
               disabled={loading}
               className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-purple-50 border border-purple-200 text-left transition-all group shadow-2xs hover:shadow-xs"
             >
@@ -89,9 +89,9 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900 group-hover:text-purple-800">
-                    Counselor (Admin)
+                    Counselor (Admin): Saloni
                   </div>
-                  <div className="text-[10px] text-slate-500">Full Access: Manage Trainers, Batches &amp; Timetable</div>
+                  <div className="text-[10px] text-slate-500">saloni@gmail.com • Full Access Admin</div>
                 </div>
               </div>
               <ArrowRight className="w-3.5 h-3.5 text-purple-600 group-hover:translate-x-0.5 transition-transform" />

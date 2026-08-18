@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       if (targetRole === 'counselor') {
-        await login('counselor@sssam.com', 'admin123');
+        await login('saloni@gmail.com', '1234567890');
       } else if (targetRole === 'trainer1') {
         await login('rahul.sharma@sssam.com', 'trainer123');
       } else if (targetRole === 'trainer2') {
