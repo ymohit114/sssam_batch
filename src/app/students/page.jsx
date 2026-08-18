@@ -196,11 +196,10 @@ export default function StudentsPage() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
                 <tr>
-                  <th className="px-5 py-3.5">Roll / Enrollment</th>
-                  <th className="px-5 py-3.5">Student Info</th>
-                  <th className="px-5 py-3.5">Contact Details</th>
-                  <th className="px-5 py-3.5">Enrolled Batches</th>
-                  <th className="px-5 py-3.5">Location</th>
+                  <th className="px-5 py-3.5">Student Name</th>
+                  <th className="px-5 py-3.5">Phone Number</th>
+                  <th className="px-5 py-3.5">Course / Subject</th>
+                  <th className="px-5 py-3.5">Enrolled Batch</th>
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
@@ -208,56 +207,40 @@ export default function StudentsPage() {
                 {students.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50/80 transition-colors">
                     
-                    {/* Roll No */}
-                    <td className="px-5 py-3.5 font-mono font-bold text-indigo-700">
-                      {student.enrollment_no}
-                    </td>
-
                     {/* Student Name */}
                     <td className="px-5 py-3.5">
                       <div className="font-bold text-slate-900 text-xs">
                         {student.name}
                       </div>
-                      <div className="text-[10px] text-slate-400">
-                        Joined {student.created_at ? new Date(student.created_at).toLocaleDateString() : '2026'}
+                      <div className="text-[10px] text-slate-400 font-mono">
+                        {student.enrollment_no}
                       </div>
                     </td>
 
                     {/* Contact */}
-                    <td className="px-5 py-3.5 text-slate-600">
-                      <div className="flex items-center gap-1.5 font-medium">
-                        <Phone className="w-3 h-3 text-slate-400" />
+                    <td className="px-5 py-3.5 text-slate-700">
+                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                        <Phone className="w-3 h-3 text-emerald-600" />
                         <span>{student.phone}</span>
                       </div>
-                      {student.email && (
-                        <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5">
-                          <Mail className="w-3 h-3 text-slate-400" />
-                          <span>{student.email}</span>
-                        </div>
-                      )}
+                    </td>
+
+                    {/* Course */}
+                    <td className="px-5 py-3.5">
+                      <span className="font-bold text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded-md border border-purple-100">
+                        {student.course_name || 'General Course'}
+                      </span>
                     </td>
 
                     {/* Enrolled Batches */}
                     <td className="px-5 py-3.5">
-                      {student.batch_codes ? (
-                        <div className="flex flex-wrap gap-1">
-                          {student.batch_codes.split(',').map((code, idx) => (
-                            <span
-                              key={idx}
-                              className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100"
-                            >
-                              {code.trim()}
-                            </span>
-                          ))}
+                      {student.batch_names ? (
+                        <div className="font-semibold text-xs text-slate-800">
+                          {student.batch_names}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-slate-400 italic">Not in any batch</span>
+                        <span className="text-[10px] text-slate-400 italic">Not assigned</span>
                       )}
-                    </td>
-
-                    {/* Location */}
-                    <td className="px-5 py-3.5 text-slate-600 font-medium">
-                      {student.city || 'Delhi'}
                     </td>
 
                     {/* Action: Counselor has delete; Trainer has restricted status */}

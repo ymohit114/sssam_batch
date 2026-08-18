@@ -32,10 +32,8 @@ export default function Sidebar() {
   ];
 
   const trainerNav = [
-    { name: 'My Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'My Batches & Timings', href: '/batches', icon: Layers },
+    { name: 'My Batches & Timetable', href: '/', icon: Layers },
     { name: 'My Students', href: '/students', icon: GraduationCap },
-    { name: 'My Timetable', href: '/timetable', icon: Calendar },
   ];
 
   const navItems = isCounselor ? counselorNav : trainerNav;
