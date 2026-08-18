@@ -16,8 +16,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    router.prefetch('/');
     if (user) {
-      router.push('/');
+      router.replace('/');
     }
   }, [user, router]);
 
@@ -28,7 +29,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
       showSuccess('Logged in successfully!');
-      router.push('/');
+      router.replace('/');
     } catch (err) {
       showError(err.message || 'Login failed. Check your credentials.');
     } finally {
@@ -44,7 +45,7 @@ export default function LoginPage() {
     try {
       await login(quickEmail, quickPassword);
       showSuccess('Logged in successfully!');
-      router.push('/');
+      router.replace('/');
     } catch (err) {
       showError(err.message);
     } finally {
