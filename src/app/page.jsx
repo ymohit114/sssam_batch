@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import CreateBatchModal from '@/components/Modals/CreateBatchModal';
@@ -24,7 +25,8 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { user, isCounselor, isTrainer } = useAuth();
+  const router = useRouter();
+  const { user, isCounselor, isTrainer, loading: authLoading } = useAuth();
   const { showSuccess, showError } = useToast();
 
   const [trainers, setTrainers] = useState([]);
@@ -42,7 +44,14 @@ export default function Dashboard() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailBatchId, setDetailBatchId] = useState(null);
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+
   const fetchData = useCallback(async () => {
+    if (!user) return;
     try {
       setLoading(true);
       const [trRes, btRes] = await Promise.all([
@@ -59,11 +68,13 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user) {
+      fetchData();
+    }
+  }, [user, fetchData]);
 
   const handleDeleteBatch = async (batchId, batchName) => {
     if (!confirm(`Are you sure you want to delete batch "${batchName}"?`)) return;
@@ -100,12 +111,12 @@ export default function Dashboard() {
     setShowDetailModal(true);
   };
 
-  if (loading) {
+  if (authLoading || !user || loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
           <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading batch schedule...</span>
+          <span>Loading batch system...</span>
         </div>
       </div>
     );
