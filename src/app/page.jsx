@@ -373,58 +373,71 @@ export default function Dashboard() {
   );
 }
 
+function formatDisplayTime(timeStr) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':');
+  let hour = parseInt(h, 10);
+  if (isNaN(hour)) return timeStr;
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12 || 12;
+  return `${hour}:${m || '00'} ${ampm}`;
+}
+
 // Single Clean Batch Card Component
 function BatchCard({ batch, isCounselor, onOpenDetail, onOpenEnroll, onOpenEdit, onDelete }) {
   const isWeekend = batch.days?.toLowerCase().includes('sat') || batch.days?.toLowerCase().includes('sun');
 
   return (
-    <div className="bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl p-4 transition-all group">
+    <div className="bg-white hover:bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 transition-all group shadow-xs hover:shadow-md">
       
       {/* Top Details */}
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-slate-900">
+            <span className="text-sm font-black text-slate-900">
               {batch.batch_name}
             </span>
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-purple-100 text-purple-800">
               {batch.batch_code}
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
-            {batch.course_name}
-          </p>
         </div>
 
         {/* Status Badge */}
-        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+        <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
           {batch.status}
         </span>
       </div>
 
-      {/* Timing & Days Pill */}
-      <div className="mt-3.5 grid grid-cols-2 gap-2 text-xs">
-        <div className="flex items-center gap-1.5 bg-white p-2 rounded-xl border border-slate-200/60 font-bold text-slate-800">
-          <Clock className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-          <span>{batch.start_time} - {batch.end_time}</span>
+      {/* BIG HIGH-VISIBILITY TIMING BLOCK */}
+      <div className="mt-3 p-3 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-purple-50/60 to-white border border-indigo-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+              {formatDisplayTime(batch.start_time)} – {formatDisplayTime(batch.end_time)}
+            </div>
+            <div className="text-[11px] font-bold text-indigo-700 mt-0.5 flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+              <span>{isWeekend ? 'Weekend (Sat - Sun)' : 'Weekdays (Mon - Thu)'}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-white p-2 rounded-xl border border-slate-200/60 font-bold text-slate-800">
-          <Calendar className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-          <span className="truncate">{isWeekend ? 'Weekend (Sat-Sun)' : 'Weekdays (Mon-Thu)'}</span>
+        <div className="text-right">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-2xs">
+            {batch.mode || 'Lab 1'}
+          </span>
         </div>
       </div>
 
-      {/* Room & Students */}
-      <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500 px-1">
-        <div className="flex items-center gap-1">
-          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-          <span>{batch.mode || 'Lab 1'}</span>
-        </div>
-
+      {/* Students Count */}
+      <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500 px-1">
         <div className="flex items-center gap-1 font-bold text-slate-700">
           <Users className="w-3.5 h-3.5 text-slate-400" />
-          <span>{batch.student_count || 0} / {batch.max_capacity || 25} Students</span>
+          <span>{batch.student_count || 0} / {batch.max_capacity || 25} Enrolled Students</span>
         </div>
       </div>
 
