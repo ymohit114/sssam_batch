@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
               <Navbar />
               <div className="flex-1 flex max-w-7xl w-full mx-auto">
                 <Sidebar />
-                <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+                <main className="flex-1 p-3.5 sm:p-6 lg:p-8 pb-28 md:pb-8 overflow-y-auto w-full max-w-full">
                   {children}
                 </main>
               </div>

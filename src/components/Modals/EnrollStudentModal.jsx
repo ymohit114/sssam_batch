@@ -101,8 +101,8 @@ export default function EnrollStudentModal({ isOpen, onClose, onSuccess, default
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-slide-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] overflow-y-auto animate-slide-in">
         
         {/* Header */}
         <div className={`px-6 py-4 border-b border-slate-100 flex items-center justify-between ${
