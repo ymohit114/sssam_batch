@@ -8,11 +8,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
-    const user = await getCurrentUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
-
     await connectDB();
-    const trainers = await User.find({ role: 'trainer' }).select('-password').sort({ name: 1 }).lean();
+    const trainers = await User.find({ role: 'trainer', status: { $ne: 'inactive' } }).select('-password').sort({ name: 1 }).lean();
 
     const trainerIds = trainers.map(t => t._id);
     const batches = await Batch.find({ trainer: { $in: trainerIds } })

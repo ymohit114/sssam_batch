@@ -19,10 +19,8 @@ function daysOverlap(daysStrA, daysStrB) {
 
 export async function GET(request) {
   try {
-    const user = await getCurrentUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
-
     await connectDB();
+    const user = await getCurrentUser(request);
     const { searchParams } = new URL(request.url);
     const trainerIdFilter = searchParams.get('trainer_id');
     const statusFilter = searchParams.get('status');
@@ -31,7 +29,7 @@ export async function GET(request) {
 
     const filter = {};
 
-    if (myBatchesOnly || (user.role === 'trainer' && !trainerIdFilter)) {
+    if (user && (myBatchesOnly || (user.role === 'trainer' && !trainerIdFilter))) {
       filter.trainer = user.id;
     } else if (trainerIdFilter && trainerIdFilter !== 'All') {
       filter.trainer = trainerIdFilter;

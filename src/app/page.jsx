@@ -56,12 +56,17 @@ export default function Dashboard() {
   }, [user, authLoading, router]);
 
   const fetchData = useCallback(async () => {
-    if (!user) return;
     try {
       setLoading(true);
+      const headers = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('sssam_auth_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const [trRes, btRes] = await Promise.all([
-        fetch('/api/trainers'),
-        fetch('/api/batches'),
+        fetch('/api/trainers', { headers, credentials: 'include' }),
+        fetch('/api/batches', { headers, credentials: 'include' }),
       ]);
       const trData = await trRes.json();
       const btData = await btRes.json();
@@ -73,7 +78,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (user) {

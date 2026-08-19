@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'sssam_batch_management_secret_key_2026_secure';
+const JWT_SECRET = process.env.JWT_SECRET || 'sssam_institute_super_secret_jwt_key_2026';
 
 export function signToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
@@ -19,7 +19,7 @@ export function verifyToken(token) {
 export async function getCurrentUser(request) {
   let token = null;
 
-  // Check Authorization header
+  // 1. Check Authorization header
   if (request) {
     const authHeader = request.headers.get('authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -27,7 +27,20 @@ export async function getCurrentUser(request) {
     }
   }
 
-  // Check cookies
+  // 2. Check request cookies directly
+  if (!token && request) {
+    try {
+      const cookieHeader = request.headers.get('cookie') || '';
+      const match = cookieHeader.match(/sssam_auth_token=([^;]+)/);
+      if (match) {
+        token = match[1];
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // 3. Check next/headers cookies()
   if (!token) {
     try {
       const cookieStore = cookies();
@@ -36,7 +49,7 @@ export async function getCurrentUser(request) {
         token = tokenCookie.value;
       }
     } catch (e) {
-      // Cookie store may not be available in all contexts
+      // ignore
     }
   }
 
