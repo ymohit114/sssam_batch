@@ -22,18 +22,45 @@ async function generateEnrollmentNo() {
 
 export async function GET(request) {
   try {
+    await connectDB();
     const user = await getCurrentUser(request);
     if (!user) return errorResponse('Unauthorized', 401);
 
-    await connectDB();
     const { searchParams } = new URL(request.url);
     const batchId = searchParams.get('batch_id');
     const q = searchParams.get('q');
 
     const filter = {};
 
-    if (batchId && batchId !== 'All') {
-      filter.batches = batchId;
+    // Strict Trainer isolation: Trainer can ONLY see students in their own batches
+    if (user.role === 'trainer') {
+      const userTrainerRecord = await User.findById(user.id);
+      const trainerBatches = await Batch.find({
+        $or: [
+          { trainer: user.id },
+          ...(userTrainerRecord?.name ? [{ trainer_name: new RegExp(userTrainerRecord.name, 'i') }] : [])
+        ]
+      }).select('_id');
+
+      const trainerBatchIds = trainerBatches.map(b => b._id);
+
+      if (trainerBatchIds.length === 0) {
+        return successResponse({ students: [] });
+      }
+
+      if (batchId && batchId !== 'All') {
+        if (!trainerBatchIds.map(String).includes(String(batchId))) {
+          return successResponse({ students: [] });
+        }
+        filter.batches = batchId;
+      } else {
+        filter.batches = { $in: trainerBatchIds };
+      }
+    } else {
+      // Counselor / Admin can see all or filter by selected batch
+      if (batchId && batchId !== 'All') {
+        filter.batches = batchId;
+      }
     }
 
     if (q) {
@@ -43,11 +70,12 @@ export async function GET(request) {
         { email: regex },
         { phone: regex },
         { enrollment_no: regex },
+        { course_name: regex },
       ];
     }
 
     const students = await Student.find(filter)
-      .populate('batches', 'batch_name batch_code')
+      .populate('batches', 'batch_name batch_code trainer')
       .sort({ createdAt: -1 })
       .lean();
 

@@ -51,10 +51,16 @@ export default function StudentsPage() {
         url += `?${params.toString()}`;
       }
 
-      const res = await fetch(url);
+      const headers = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('sssam_auth_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(url, { headers, credentials: 'include' });
       const data = await res.json();
       if (data.success) {
-        setStudents(data.students);
+        setStudents(data.students || []);
       }
     } catch (err) {
       showError('Failed to load students');
@@ -65,10 +71,16 @@ export default function StudentsPage() {
 
   const fetchBatches = useCallback(async () => {
     try {
-      const res = await fetch('/api/batches');
+      const headers = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('sssam_auth_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch('/api/batches', { headers, credentials: 'include' });
       const data = await res.json();
       if (data.success) {
-        setBatches(data.batches);
+        setBatches(data.batches || []);
       }
     } catch (e) {
       // ignore
@@ -92,7 +104,13 @@ export default function StudentsPage() {
 
     setDeletingId(studentId);
     try {
-      const res = await fetch(`/api/students/${studentId}`, { method: 'DELETE' });
+      const headers = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('sssam_auth_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`/api/students/${studentId}`, { method: 'DELETE', headers, credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete student');
 
@@ -105,6 +123,11 @@ export default function StudentsPage() {
     }
   };
 
+  // Filter available batches in dropdown for Trainer
+  const displayBatches = isTrainer
+    ? batches.filter(b => b.trainer_name?.toLowerCase().includes(user?.name?.toLowerCase()))
+    : batches;
+
   return (
     <div className="space-y-6">
       
@@ -112,17 +135,19 @@ export default function StudentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-              Student Directory
+            <span className={`font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
+              isCounselor ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'
+            }`}>
+              {isCounselor ? 'Institute Student Directory' : 'My Batch Students'}
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">
-            Enrolled Students Roster
+            {isCounselor ? 'All Enrolled Students Roster' : `Students Enrolled in My Batches (${students.length})`}
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {isCounselor
-              ? 'Complete student records with full enrollment and removal authority.'
-              : 'View enrolled students. You can enroll new students; removal is restricted to Counselor.'}
+              ? 'Complete institute student records with full enrollment and removal authority.'
+              : 'Viewing students enrolled exclusively across your active batches.'}
           </p>
         </div>
 
@@ -139,16 +164,6 @@ export default function StudentsPage() {
         </button>
       </div>
 
-      {/* Role Policy Reminder Box for Trainer */}
-      {isTrainer && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
-          <UserCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-bold">Trainer Student Management Policy:</span> You have full permissions to enroll new students into your assigned batches. To maintain central academic auditing, removing or un-enrolling students is restricted to the Counselor.
-          </div>
-        </div>
-      )}
-
       {/* Filter & Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         
@@ -160,7 +175,7 @@ export default function StudentsPage() {
             placeholder="Search by student name, roll no, phone, or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none"
           />
         </div>
 
@@ -170,10 +185,10 @@ export default function StudentsPage() {
           <select
             value={selectedBatchId}
             onChange={(e) => setSelectedBatchId(e.target.value)}
-            className="text-xs font-medium border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="text-xs font-medium border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
           >
-            <option value="All">All Batches</option>
-            {batches.map(b => (
+            <option value="All">All {isTrainer ? 'My' : ''} Batches</option>
+            {displayBatches.map(b => (
               <option key={b.id} value={b.id}>{b.batch_code} - {b.batch_name}</option>
             ))}
           </select>
