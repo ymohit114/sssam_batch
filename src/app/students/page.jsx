@@ -209,8 +209,8 @@ export default function StudentsPage() {
 
       </div>
 
-      {/* Students Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      {/* Desktop Table View (hidden on mobile) */}
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {loading ? (
           <div className="py-20 text-center text-xs text-slate-400 font-semibold">Loading student roster...</div>
         ) : students.length === 0 ? (
@@ -234,7 +234,6 @@ export default function StudentsPage() {
               <tbody className="divide-y divide-slate-100 bg-white">
                 {students.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50/80 transition-colors">
-                    
                     {/* Student Name */}
                     <td className="px-5 py-3.5">
                       <div className="font-bold text-slate-900 text-xs">
@@ -247,10 +246,10 @@ export default function StudentsPage() {
 
                     {/* Contact */}
                     <td className="px-5 py-3.5 text-slate-700">
-                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <a href={`tel:${student.phone}`} className="flex items-center gap-1.5 font-bold text-xs hover:text-emerald-700">
                         <Phone className="w-3 h-3 text-emerald-600" />
                         <span>{student.phone}</span>
-                      </div>
+                      </a>
                     </td>
 
                     {/* Course */}
@@ -271,7 +270,7 @@ export default function StudentsPage() {
                       )}
                     </td>
 
-                    {/* Action: Counselor has delete; Trainer has restricted status */}
+                    {/* Action */}
                     <td className="px-5 py-3.5 text-right">
                       {isCounselor ? (
                         <button
@@ -292,12 +291,64 @@ export default function StudentsPage() {
                         </span>
                       )}
                     </td>
-
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        )}
+      </div>
+
+      {/* Mobile Card View (shown only on mobile < md) */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <div className="py-12 text-center text-xs text-slate-400 font-semibold bg-white rounded-2xl border border-slate-200">
+            Loading student roster...
+          </div>
+        ) : students.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 text-center space-y-2 border border-slate-200">
+            <GraduationCap className="w-10 h-10 text-slate-300 mx-auto" />
+            <h3 className="text-sm font-bold text-slate-700">No students found</h3>
+            <p className="text-xs text-slate-400">Click "Enroll Student" to add a student to a batch.</p>
+          </div>
+        ) : (
+          students.map((student) => (
+            <div key={student.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="font-bold text-slate-900 text-sm">{student.name}</div>
+                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">{student.enrollment_no}</div>
+                </div>
+                <span className="font-bold text-[11px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-100 shrink-0">
+                  {student.course_name || 'General Course'}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-xs">
+                <a href={`tel:${student.phone}`} className="flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-100">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{student.phone}</span>
+                </a>
+
+                <div className="text-[11px] font-semibold text-slate-600 truncate max-w-[150px]">
+                  {student.batch_names || 'No Batch'}
+                </div>
+              </div>
+
+              {isCounselor && (
+                <div className="pt-2 border-t border-slate-100 flex justify-end">
+                  <button
+                    onClick={() => handleDeleteStudent(student.id, student.name)}
+                    disabled={deletingId === student.id}
+                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove Student</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
         )}
       </div>
 
