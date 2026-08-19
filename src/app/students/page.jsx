@@ -131,37 +131,50 @@ export default function StudentsPage() {
   return (
     <div className="space-y-6">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* Header & Stats Banner */}
+      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className={`font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
               isCounselor ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'
             }`}>
-              {isCounselor ? 'Institute Student Directory' : 'My Batch Students'}
+              {isCounselor ? '👑 Institute Student Directory' : '🧑‍🏫 My Batch Students'}
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">
-            {isCounselor ? 'All Enrolled Students Roster' : `Students Enrolled in My Batches (${students.length})`}
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {isCounselor ? 'Student Directory' : 'My Students Roster'}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500">
             {isCounselor
-              ? 'Complete institute student records with full enrollment and removal authority.'
-              : 'Viewing students enrolled exclusively across your active batches.'}
+              ? 'Complete list of all students enrolled across all trainers and batches.'
+              : 'Students enrolled exclusively in your assigned batches.'}
           </p>
         </div>
 
-        <button
-          onClick={() => setIsEnrollModalOpen(true)}
-          className={`flex items-center gap-2 px-4 py-2 text-white text-xs font-bold rounded-xl shadow-md transition-all ${
-            isCounselor
-              ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-500/20'
-              : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20'
-          }`}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Enroll New Student</span>
-        </button>
+        {/* Total Students Stat Badge & Action */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex-1 md:flex-none flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl">
+            <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black shadow-xs shrink-0">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wider font-extrabold text-purple-700">Total Students</div>
+              <div className="text-xl font-black text-slate-900 leading-none mt-0.5">{students.length}</div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsEnrollModalOpen(true)}
+            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 text-white text-xs font-bold rounded-2xl shadow-md transition-all ${
+              isCounselor
+                ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-500/20'
+                : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20'
+            }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Enroll Student</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter & Search Bar */}
