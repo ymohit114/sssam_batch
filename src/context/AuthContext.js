@@ -93,6 +93,12 @@ export function AuthProvider({ children }) {
         await login('mohit@gmail.com', '1234567890');
       } else if (targetRole === 'sudesh') {
         await login('sudesh@gmail.com', '1234567890');
+      } else if (targetRole === 'ankit') {
+        await login('ankit@gmail.com', '1234567890');
+      } else if (targetRole === 'sudhir') {
+        await login('sudhir@gmail.com', '1234567890');
+      } else if (targetRole === 'ripan') {
+        await login('ripan@gmail.com', '1234567890');
       }
     } catch (err) {
       console.error('Demo switch error:', err);

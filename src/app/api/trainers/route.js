@@ -29,6 +29,7 @@ export async function GET(request) {
         name: trainer.name,
         email: trainer.email,
         phone: trainer.phone,
+        role: trainer.role || 'trainer',
         specialization: trainer.specialization,
         status: trainer.status,
         createdAt: trainer.createdAt,

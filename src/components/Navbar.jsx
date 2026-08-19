@@ -118,6 +118,42 @@ export default function Navbar() {
                       </div>
                       {user.email === 'sudesh@gmail.com' && <span className="w-2 h-2 rounded-full bg-emerald-600"></span>}
                     </button>
+
+                    {/* Ankit Yadav */}
+                    <button
+                      onClick={() => { switchDemoUser('ankit'); setShowDemoMenu(false); }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-sky-50 flex items-center justify-between group transition-colors"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-800 group-hover:text-sky-700">🧑‍🏫 Ankit Yadav</div>
+                        <div className="text-[10px] text-slate-500">ankit@gmail.com • Data Analytics &amp; Data Science</div>
+                      </div>
+                      {user.email === 'ankit@gmail.com' && <span className="w-2 h-2 rounded-full bg-sky-600"></span>}
+                    </button>
+
+                    {/* Sudhir Kumar */}
+                    <button
+                      onClick={() => { switchDemoUser('sudhir'); setShowDemoMenu(false); }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-amber-50 flex items-center justify-between group transition-colors"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-800 group-hover:text-amber-700">🧑‍🏫 Sudhir Kumar</div>
+                        <div className="text-[10px] text-slate-500">sudhir@gmail.com • Java</div>
+                      </div>
+                      {user.email === 'sudhir@gmail.com' && <span className="w-2 h-2 rounded-full bg-amber-600"></span>}
+                    </button>
+
+                    {/* Ripan Preet Kaur */}
+                    <button
+                      onClick={() => { switchDemoUser('ripan'); setShowDemoMenu(false); }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-rose-50 flex items-center justify-between group transition-colors"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-800 group-hover:text-rose-700">🧑‍🏫 Ripan Preet Kaur</div>
+                        <div className="text-[10px] text-slate-500">ripan@gmail.com • Basic</div>
+                      </div>
+                      {user.email === 'ripan@gmail.com' && <span className="w-2 h-2 rounded-full bg-rose-600"></span>}
+                    </button>
                   </div>
                 </>
               )}

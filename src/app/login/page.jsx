@@ -140,6 +140,69 @@ export default function LoginPage() {
               </div>
               <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
             </button>
+
+            {/* Trainer Ankit Yadav */}
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('ankit@gmail.com', '1234567890')}
+              disabled={loading}
+              className="flex items-center justify-between p-3 rounded-xl bg-white hover:bg-sky-50 border border-sky-200 text-left transition-all group shadow-xs"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs font-bold">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
+                    🧑‍🏫 Ankit Yadav (Data Analytics &amp; Data Science)
+                  </div>
+                  <div className="text-[10px] text-slate-500">Data Analytics &amp; Data Science Trainer • Add Students</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-sky-600 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+
+            {/* Trainer Sudhir Kumar */}
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('sudhir@gmail.com', '1234567890')}
+              disabled={loading}
+              className="flex items-center justify-between p-3 rounded-xl bg-white hover:bg-amber-50 border border-amber-200 text-left transition-all group shadow-xs"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs font-bold">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-900 group-hover:text-amber-800">
+                    🧑‍🏫 Sudhir Kumar (Java)
+                  </div>
+                  <div className="text-[10px] text-slate-500">Java Trainer • Add Students</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-amber-600 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+
+            {/* Trainer Ripan Preet Kaur */}
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('ripan@gmail.com', '1234567890')}
+              disabled={loading}
+              className="flex items-center justify-between p-3 rounded-xl bg-white hover:bg-rose-50 border border-rose-200 text-left transition-all group shadow-xs"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs font-bold">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-900 group-hover:text-rose-800">
+                    🧑‍🏫 Ripan Preet Kaur (Basic)
+                  </div>
+                  <div className="text-[10px] text-slate-500">Basic Computer &amp; Office Trainer • Add Students</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         </div>
 

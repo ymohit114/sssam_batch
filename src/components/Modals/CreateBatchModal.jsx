@@ -200,7 +200,7 @@ export default function CreateBatchModal({ isOpen, onClose, onSuccess, editBatch
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
               Assign Trainer *
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {trainers.map((tr) => (
                 <button
                   type="button"
